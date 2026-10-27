@@ -1,0 +1,7 @@
+# Ejercicio 6 — Reflexión
+
+**c) ¿Qué pasa al eliminar desde MySQL una categoría con productos asociados?**
+MySQL rechaza la operación con el error 1451 (*Cannot delete or update a parent row: a foreign key constraint fails*). La tabla `producto` tiene una llave foránea hacia `categoria`, y la base de datos no permite dejar productos apuntando a una categoría que ya no existe (integridad referencial). Esto se relaciona con la composición: en el modelo, `Producto` contiene un objeto `Categoria`, es decir, un producto no tiene sentido sin su categoría. La llave foránea es la forma en que la base de datos obliga a cumplir esa dependencia; para borrar la categoría primero hay que eliminar o reasignar sus productos.
+
+**d) Ventaja de separar en `conexion`, `model`, `dao` y `vista`, y qué cambiaría con PostgreSQL**
+Cada paquete tiene una única responsabilidad, así que el código es más fácil de entender, probar y mantener: se puede cambiar la interfaz sin tocar el acceso a datos, y viceversa, y el SQL queda solo en los DAO. Si la tienda migra a PostgreSQL, cambiaría únicamente la capa de datos: la dependencia del driver en el `pom.xml` (`org.postgresql:postgresql`), la URL/usuario/clave en `Conexion` (`jdbc:postgresql://localhost:5432/tienda`) y, en el script, detalles de sintaxis como `AUTO_INCREMENT` por `SERIAL`/`IDENTITY`. Las clases `model` y `vista` no se modifican, y los DAO casi nada (las consultas son SQL estándar con `PreparedStatement`).
